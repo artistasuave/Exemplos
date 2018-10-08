@@ -24,11 +24,11 @@ public class MacarraoDAO {
                 ps.setString(1, macarrao.getTipo());
                 ps.setDouble(2, macarrao.getPeso());
                 ps.setString(3, macarrao.getMarca());
-                ps.setBoolean(1, macarrao.isAldente());
+                ps.setBoolean(4, macarrao.isAldente());
                 ps.execute();
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    rs.getInt(1);
+                    return rs.getInt(1);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -54,7 +54,7 @@ public class MacarraoDAO {
                     macarrao.setMarca(rs.getString("marca"));
                     macarrao.setPeso(rs.getDouble("peso"));
                     macarrao.setAldente(rs.getBoolean("aldente"));
-
+                    return macarrao;
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -64,3 +64,48 @@ public class MacarraoDAO {
         }
         return null;
     }
+
+    public boolean alterar(Macarrao magali) {
+        Connection conexao = Conexao.conectar();
+        if (conexao != null) {
+            String sql = "UPDATE macarroes SET"
+                    + "\ntipo= ?,"
+                    + "\nmarca= ?,"
+                    + "\npeso= ?,"
+                    + "\naldente =?"
+                    + "\n WHERE id= ?";
+            try {
+                PreparedStatement ps = conexao.prepareStatement(sql);
+                ps.setString(1, magali.getTipo());
+                ps.setString(2, magali.getMarca());
+                ps.setDouble(3, magali.getPeso());
+                ps.setBoolean(4, magali.isAldente());
+                ps.setInt(5, magali.getId());
+                return ps.executeUpdate() == 1;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                Conexao.desconectar();
+            }
+        }
+        return false;
+    }
+
+    public boolean apagar(int identificador) {
+        Connection conexao = Conexao.conectar();
+        if (conexao != null) {
+            String sql = "DELETE FROM macarroes WHERE id = ?";
+            try {
+                PreparedStatement ps = conexao.prepareStatement(sql);
+                ps.setInt(1, identificador);
+                return ps.executeUpdate() == 1;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                Conexao.desconectar();
+            }
+        }
+        return false;
+    }
+
+}
